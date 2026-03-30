@@ -1,5 +1,4 @@
 input_file = "./inputs/day7.txt"
-# input_file = "./inputs/test.txt"
 
 
 def read_manifold(fp: str):
@@ -29,28 +28,19 @@ def count_timelines(manifold):
     splitter_locs = set(manifold["splitter_locs"])
     r, c = manifold["r"], manifold["c"]
 
-    # bfs
-    queue = [start_loc]
-    timelines = 0
+    f = [[0 for j in range(c)] for i in range(r)]
 
-    while queue:
-        node = queue.pop(0)
-        y, x = node
+    for i in range(c):
+        f[r - 1][i] = 1
 
-        # reached bottom of manifold
-        if y == r - 1:
-            timelines += 1
-            continue
+    for j in range(r - 2, -1, -1):
+        for i in range(c):
+            if (j, i) in splitter_locs:
+                f[j][i] = f[j + 1][i - 1] + f[j + 1][i + 1]
+            else:
+                f[j][i] = f[j + 1][i]
 
-        if node in splitter_locs:
-            next_nodes = [(y + 1, x - 1), (y + 1, x + 1)]
-        else:
-            next_nodes = [(y + 1, x)]
-
-        for next_node in next_nodes:
-            queue.append(next_node)
-
-    return timelines
+    return f[0][start_loc[1]]
 
 
 manifold = read_manifold(input_file)
